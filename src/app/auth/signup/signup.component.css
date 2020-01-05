@@ -1,3 +1,8 @@
-mat-form-field {
+mat-form-field,
+mat-checkbox {
   width: 300px;
+}
+
+mat-checkbox {
+  margin: 10px 0;
 }

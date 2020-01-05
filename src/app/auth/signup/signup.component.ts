@@ -8,21 +8,27 @@ import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/fo
 })
 export class SignupComponent implements OnInit {
   formGroup: FormGroup;
+  maxBirthdayDate: Date;
 
   constructor() { }
 
   ngOnInit() {
     this.formGroup = new FormGroup({
       'email': new FormControl('', [Validators.required, Validators.email]),
-      'password': new FormControl('', [Validators.required, Validators.minLength(6)])
+      'password': new FormControl('', [Validators.required, Validators.minLength(6)]),
+      'birthday': new FormControl('', [Validators.required]),
+      'toc': new FormControl('', [Validators.requiredTrue])
     });
+
+    this.maxBirthdayDate = new Date();
+    return this.maxBirthdayDate.setFullYear(this.maxBirthdayDate.getFullYear() - 18);
   }
 
   onSubmit() {
     console.log(this.formGroup.value);
   }
 
-  getCurrentEmailLength(): number {
+  private getCurrentEmailLength(): number {
     return this.formGroup.value.email.length;
   }
 
@@ -38,7 +44,7 @@ export class SignupComponent implements OnInit {
     return this.getCurrentEmailLength() > 0 && !control.valid && control.touched;
   }
 
-  getCurrentPasswordLength(): number {
+  private getCurrentPasswordLength(): number {
     return this.formGroup.value.password.length <= 6 ? this.formGroup.value.password.length : 6;
   }
 
@@ -58,5 +64,27 @@ export class SignupComponent implements OnInit {
     const control: AbstractControl = this.formGroup.get('password');
 
     return this.getCurrentPasswordLength() > 0 && !control.valid && control.touched;
+  }
+
+  private getCurrentBirthdayLength(): number {
+    return this.formGroup.value.birthday ? this.formGroup.value.birthday.length : 0;
+  }
+
+  displayBirthdayHint(): boolean {
+    const control: AbstractControl = this.formGroup.get('birthday');
+
+    return this.getCurrentBirthdayLength() === 0 && !control.touched;
+  }
+
+  displayBirthdayEmptyError(): boolean {
+    const control: AbstractControl = this.formGroup.get('birthday');
+
+    return this.getCurrentBirthdayLength() === 0 && control.touched;
+  }
+
+  displayBirthdayInvalidError(): boolean {
+    const control: AbstractControl = this.formGroup.get('birthday');
+
+    return this.getCurrentBirthdayLength() > 0 && !control.valid && control.touched;
   }
 }

@@ -1,4 +1,5 @@
 <section>
+  <!-- fxLayoutGap="10px" -->
   <form fxLayout="column" fxLayoutAlign="whatever center" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <mat-form-field>
       <input type="email" matInput placeholder="Email Address" autocomplete="email" formControlName="email" required>
@@ -15,6 +16,20 @@
       <mat-error *ngIf="displayPasswordEmptyError()">Please enter a password</mat-error>
       <mat-error *ngIf="displayPasswordInvalidError()">Password must be at least 6 characters</mat-error>
     </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Birthday" [matDatepicker]="birthdayPicker" [max]="maxBirthdayDate"
+        autocomplete="bday" formControlName="birthday" required>
+      <mat-datepicker-toggle matSuffix [for]="birthdayPicker"></mat-datepicker-toggle>
+      <mat-datepicker #birthdayPicker></mat-datepicker>
+      <mat-hint *ngIf="displayBirthdayHint()">Must be 18 years or older</mat-hint>
+      <mat-error *ngIf="displayBirthdayEmptyError()">Please enter a birthday</mat-error>
+      <mat-error *ngIf="displayBirthdayInvalidError()">Must be 18 years or older</mat-error>
+    </mat-form-field>
+
+    <mat-checkbox labelPosition="after" color="primary" formControlName="toc" requiredTrue>
+      Agree to Terms & Conditions
+    </mat-checkbox>
 
     <button mat-raised-button color="primary" type="submit" [disabled]="!formGroup.valid">Submit</button>
   </form>
