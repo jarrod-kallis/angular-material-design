@@ -28,20 +28,32 @@ export class SignupComponent implements OnInit {
     console.log(this.formGroup.value);
   }
 
+  getControl(name: string): AbstractControl {
+    return this.formGroup.get(name);
+  }
+
+  get emailControl(): Function {
+    return this.getControl.bind(this, 'email');
+  }
+
+  get passwordControl(): Function {
+    return this.getControl.bind(this, 'password');
+  }
+
+  get birthdayControl(): Function {
+    return this.getControl.bind(this, 'birthday');
+  }
+
   private getCurrentEmailLength(): number {
     return this.formGroup.value.email.length;
   }
 
   displayEmailEmptyError(): boolean {
-    const control: AbstractControl = this.formGroup.get('email');
-
-    return this.getCurrentEmailLength() === 0 && control.touched;
+    return this.getCurrentEmailLength() === 0 && this.emailControl().touched;
   }
 
   displayEmailInvalidError(): boolean {
-    const control: AbstractControl = this.formGroup.get('email');
-
-    return this.getCurrentEmailLength() > 0 && !control.valid && control.touched;
+    return this.getCurrentEmailLength() > 0 && !this.emailControl().valid && this.emailControl().touched;
   }
 
   private getCurrentPasswordLength(): number {
@@ -49,21 +61,15 @@ export class SignupComponent implements OnInit {
   }
 
   displayPasswordHint(): boolean {
-    const control: AbstractControl = this.formGroup.get('password');
-
-    return this.getCurrentPasswordLength() === 0 && !control.touched;
+    return this.getCurrentPasswordLength() === 0 && !this.passwordControl().touched;
   }
 
   displayPasswordEmptyError(): boolean {
-    const control: AbstractControl = this.formGroup.get('password');
-
-    return this.getCurrentPasswordLength() === 0 && control.touched;
+    return this.getCurrentPasswordLength() === 0 && this.passwordControl().touched;
   }
 
   displayPasswordInvalidError(): boolean {
-    const control: AbstractControl = this.formGroup.get('password');
-
-    return this.getCurrentPasswordLength() > 0 && !control.valid && control.touched;
+    return this.getCurrentPasswordLength() > 0 && !this.passwordControl().valid && this.passwordControl().touched;
   }
 
   private getCurrentBirthdayLength(): number {
@@ -71,20 +77,14 @@ export class SignupComponent implements OnInit {
   }
 
   displayBirthdayHint(): boolean {
-    const control: AbstractControl = this.formGroup.get('birthday');
-
-    return this.getCurrentBirthdayLength() === 0 && !control.touched;
+    return this.getCurrentBirthdayLength() === 0 && !this.birthdayControl().touched;
   }
 
   displayBirthdayEmptyError(): boolean {
-    const control: AbstractControl = this.formGroup.get('birthday');
-
-    return this.getCurrentBirthdayLength() === 0 && control.touched;
+    return this.getCurrentBirthdayLength() === 0 && this.birthdayControl().touched;
   }
 
   displayBirthdayInvalidError(): boolean {
-    const control: AbstractControl = this.formGroup.get('birthday');
-
-    return this.getCurrentBirthdayLength() > 0 && !control.valid && control.touched;
+    return this.getCurrentBirthdayLength() > 0 && !this.birthdayControl().valid && this.birthdayControl().touched;
   }
 }

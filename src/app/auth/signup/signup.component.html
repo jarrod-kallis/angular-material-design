@@ -9,7 +9,7 @@
 
     <mat-form-field>
       <!-- hintLabel="Should be at least 6 characters"> -->
-      <input type="password" matInput placeholder="Password" autocomplete="current-password" formControlName="password"
+      <input type="password" matInput placeholder="Password" autocomplete="new-password" formControlName="password"
         required>
       <mat-hint *ngIf="displayPasswordHint()">Should be at least 6 characters</mat-hint>
       <mat-hint align="end">{{ getCurrentPasswordLength() }}/6</mat-hint>
