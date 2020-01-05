@@ -1,1 +1,13 @@
-<router-outlet></router-outlet>
+<mat-sidenav-container>
+  <mat-sidenav #sideNav role="navigation" fxHide.gt-xs>
+    <mat-nav-list (click)="sideNav.toggle()">
+      <app-navigation-links displayIcons="true"></app-navigation-links>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <app-navigation-toolbar (onToggleSideNav)="toggleSideNav()"></app-navigation-toolbar>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

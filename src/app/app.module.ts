@@ -14,6 +14,9 @@ import { CurrentTrainingComponent } from './training/current-training/current-tr
 import { NewTrainingComponent } from './training/new-training/new-training.component';
 import { PastTrainingsComponent } from './training/past-trainings/past-trainings.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { NavigationLinksComponent } from './navigation/navigation-links/navigation-links.component';
+import { NavigationToolbarComponent } from './navigation/navigation-toolbar/navigation-toolbar.component';
+import { NavigationLinkComponent } from './navigation/navigation-links/navigation-link/navigation-link.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +27,10 @@ import { WelcomeComponent } from './welcome/welcome.component';
     CurrentTrainingComponent,
     NewTrainingComponent,
     PastTrainingsComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    NavigationLinksComponent,
+    NavigationToolbarComponent,
+    NavigationLinkComponent
   ],
   imports: [
     BrowserModule,

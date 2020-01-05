@@ -1,0 +1,17 @@
+.navigation-link {
+  color: white;
+}
+
+.navigation-link:hover,
+.navigation-link:active {
+  color: lightgray;
+}
+
+.caption {
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.navigation-caption-enlarge {
+  font-size: 20px;
+}

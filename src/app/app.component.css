@@ -1,0 +1,8 @@
+mat-sidenav-container {
+  height: 100vh;
+}
+
+mat-sidenav {
+  width: 250px;
+  background-color: #3f51b5;
+}

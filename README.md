@@ -5,6 +5,7 @@ Generate a component for a specific module: `ng g c auth/signup --module app.mod
 ##Angular Material
 
 [https://material.angular.io/](https://material.angular.io/)
+[icons](https://material.io/resources/icons/?style=baseline)
 
 ##[Useful Resources & Links](https://altronbsi.udemy.com/course/angular-full-app-with-angular-material-angularfire-ngrx/learn/lecture/9120204#overview)
 

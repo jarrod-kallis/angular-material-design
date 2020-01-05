@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { MatSidenav } from '@angular/material';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'fitness-tracker';
+  @ViewChild('sideNav', { static: false }) sideNav: MatSidenav;
+
+  toggleSideNav() {
+    this.sideNav.toggle();
+  }
 }
