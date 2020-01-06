@@ -16,11 +16,19 @@ export class CurrentTrainingComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.clearProgressTimer = setInterval(() => {
-      this.progressPercentage = Math.ceil(this.progressPercentage + (1 / 60 * 100));
+      this.progressPercentage = Math.ceil(this.progressPercentage + (1 / 60 * 1000));
+      if (this.progressPercentage >= 100) {
+        this.progressPercentage = 100;
+        this.removeProgressTimer();
+      }
     }, 1000);
   }
 
   ngOnDestroy() {
+    this.removeProgressTimer();
+  }
+
+  removeProgressTimer() {
     clearInterval(this.clearProgressTimer);
   }
 
