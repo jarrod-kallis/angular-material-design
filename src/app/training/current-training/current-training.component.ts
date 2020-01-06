@@ -1,5 +1,8 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material';
+
 import { TrainingService } from '../training.service';
+import { StopTrainingDialogComponent } from './stop-training-dialog/stop-training-dialog.component';
 
 @Component({
   selector: 'app-current-training',
@@ -12,11 +15,20 @@ export class CurrentTrainingComponent implements OnInit, OnDestroy {
   clearProgressTimer: NodeJS.Timer;
   progressPercentage: number = 0;
 
-  constructor(private trainingService: TrainingService) { }
+  constructor(private trainingService: TrainingService, private dialog: MatDialog) { }
 
   ngOnInit() {
+    this.startTimer();
+  }
+
+  ngOnDestroy() {
+    this.removeProgressTimer();
+  }
+
+  startTimer() {
     this.clearProgressTimer = setInterval(() => {
-      this.progressPercentage = Math.ceil(this.progressPercentage + (1 / 60 * 1000));
+      this.progressPercentage = Math.ceil(this.progressPercentage + (1 / 60 * 100));
+
       if (this.progressPercentage >= 100) {
         this.progressPercentage = 100;
         this.removeProgressTimer();
@@ -24,15 +36,22 @@ export class CurrentTrainingComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  ngOnDestroy() {
-    this.removeProgressTimer();
-  }
-
   removeProgressTimer() {
     clearInterval(this.clearProgressTimer);
   }
 
   stopClick() {
-    this.trainingService.stopTraining();
+    this.removeProgressTimer();
+
+    const dialogRef = this.dialog.open(StopTrainingDialogComponent,
+      { data: { progress: this.progressPercentage } });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.trainingService.stopTraining();
+      } else {
+        this.startTimer();
+      }
+    });
   }
 }

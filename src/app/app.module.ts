@@ -17,6 +17,7 @@ import { WelcomeComponent } from './welcome/welcome.component';
 import { NavigationLinksComponent } from './navigation/navigation-links/navigation-links.component';
 import { NavigationToolbarComponent } from './navigation/navigation-toolbar/navigation-toolbar.component';
 import { NavigationLinkComponent } from './navigation/navigation-links/navigation-link/navigation-link.component';
+import { StopTrainingDialogComponent } from './training/current-training/stop-training-dialog/stop-training-dialog.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { NavigationLinkComponent } from './navigation/navigation-links/navigatio
     WelcomeComponent,
     NavigationLinksComponent,
     NavigationToolbarComponent,
-    NavigationLinkComponent
+    NavigationLinkComponent,
+    StopTrainingDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -41,6 +43,7 @@ import { NavigationLinkComponent } from './navigation/navigation-links/navigatio
     AngularMaterialModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [StopTrainingDialogComponent]
 })
 export class AppModule { }
