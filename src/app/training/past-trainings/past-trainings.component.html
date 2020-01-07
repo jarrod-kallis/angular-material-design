@@ -15,13 +15,13 @@
   </ng-container>
 
   <ng-container matColumnDef="duration">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Duration</th>
-    <td mat-cell *matCellDef="let element">{{ element.duration | number }} sec</td>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header arrowPosition="before">Duration</th>
+    <td mat-cell *matCellDef="let element" align="right">{{ element.duration | number }} sec</td>
   </ng-container>
 
   <ng-container matColumnDef="calories">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Calories</th>
-    <td mat-cell *matCellDef="let element">{{ element.calories | number }} cal</td>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header arrowPosition="before">Calories</th>
+    <td mat-cell *matCellDef="let element" align="right">{{ element.calories | number }} cal</td>
   </ng-container>
 
   <ng-container matColumnDef="status">
