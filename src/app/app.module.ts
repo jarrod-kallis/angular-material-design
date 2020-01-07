@@ -18,6 +18,7 @@ import { NavigationLinksComponent } from './navigation/navigation-links/navigati
 import { NavigationToolbarComponent } from './navigation/navigation-toolbar/navigation-toolbar.component';
 import { NavigationLinkComponent } from './navigation/navigation-links/navigation-link/navigation-link.component';
 import { StopTrainingDialogComponent } from './training/current-training/stop-training-dialog/stop-training-dialog.component';
+import { StatusPipe } from './training/status.pipe';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { StopTrainingDialogComponent } from './training/current-training/stop-tr
     NavigationLinksComponent,
     NavigationToolbarComponent,
     NavigationLinkComponent,
-    StopTrainingDialogComponent
+    StopTrainingDialogComponent,
+    StatusPipe
   ],
   imports: [
     BrowserModule,
