@@ -8,13 +8,15 @@ import { TrainingComponent } from './training/training.component';
 import { NewTrainingComponent } from './training/new-training/new-training.component';
 import { CurrentTrainingComponent } from './training/current-training/current-training.component';
 import { PastTrainingsComponent } from './training/past-trainings/past-trainings.component';
+import { AuthRouteGuardService } from './auth/auth-route-guard.service';
 
 const routes: Routes = [
   { path: '', component: WelcomeComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'login', component: LoginComponent },
   {
-    path: 'training', component: TrainingComponent, children: [
+    path: 'training', component: TrainingComponent, canActivate: [AuthRouteGuardService],
+    children: [
       { path: 'new', component: NewTrainingComponent },
       { path: 'past', component: PastTrainingsComponent },
       { path: 'current', component: CurrentTrainingComponent }

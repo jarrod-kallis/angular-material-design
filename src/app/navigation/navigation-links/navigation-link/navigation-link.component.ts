@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-navigation-link',
@@ -11,6 +11,8 @@ export class NavigationLinkComponent implements OnInit {
   @Input() caption: string;
   @Input() navigationCaptionClass: string = '';
 
+  @Output() onClick = new EventEmitter<void>();
+
   constructor() { }
 
   ngOnInit() {
@@ -22,5 +24,11 @@ export class NavigationLinkComponent implements OnInit {
 
   getCaptionClass(): string {
     return 'caption ' + this.navigationCaptionClass;
+  }
+
+  onLinkClick() {
+    if (this.onClick) {
+      this.onClick.emit();
+    }
   }
 }

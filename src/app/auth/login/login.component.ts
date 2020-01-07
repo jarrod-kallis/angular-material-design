@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
 
+import { AuthService } from '../auth.service';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -9,7 +11,7 @@ import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/fo
 export class LoginComponent implements OnInit {
   formGroup: FormGroup;
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
     this.formGroup = new FormGroup({
@@ -19,7 +21,7 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.formGroup.value);
+    this.authService.login(this.formGroup.value.email, this.formGroup.value.password);
   }
 
   getControl(name: string): AbstractControl {

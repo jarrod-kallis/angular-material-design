@@ -1,4 +1,4 @@
-<a mat-list-item [routerLink]="routerLink" class="navigation-link">
+<a mat-list-item [routerLink]="routerLink" class="navigation-link" (click)="onLinkClick()">
   <mat-icon *ngIf="displayIcon()">{{ iconName }}</mat-icon>
   <span [class]="getCaptionClass()">{{ caption }}</span>
 </a>

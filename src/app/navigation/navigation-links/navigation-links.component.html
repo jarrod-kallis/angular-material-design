@@ -1,10 +1,13 @@
-<app-navigation-link routerLink="signup" [iconName]="displayIcon() && 'create'" caption="Sign Up">
+<app-navigation-link *ngIf="!isAuthenticated" routerLink="signup" [iconName]="displayIcon() && 'create'"
+  caption="Sign Up">
 </app-navigation-link>
-<app-navigation-link routerLink="login" [iconName]="displayIcon() && 'lock'" caption="Log In">
+<app-navigation-link *ngIf="!isAuthenticated" routerLink="login" [iconName]="displayIcon() && 'lock'" caption="Log In">
 </app-navigation-link>
-<app-navigation-link routerLink="training" [iconName]="displayIcon() && 'fitness_center'" caption="Training">
+<app-navigation-link *ngIf="isAuthenticated" routerLink="training" [iconName]="displayIcon() && 'fitness_center'"
+  caption="Training">
 </app-navigation-link>
-<app-navigation-link [iconName]="displayIcon() && 'exit_to_app'" caption="Logout">
+<app-navigation-link *ngIf="isAuthenticated" [iconName]="displayIcon() && 'exit_to_app'" caption="Logout"
+  (onClick)="onLogout()">
 </app-navigation-link>
 
 <!-- <mat-list-item class="navigation-link">
