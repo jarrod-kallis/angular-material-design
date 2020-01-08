@@ -1,4 +1,4 @@
-<section fxLayout fxLayoutAlign="center">
+<section fxLayout fxLayoutAlign="center" *ngIf="!exerciseStarted">
   <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <mat-card fxFlex.xs="grow" fxFlex.gt-xs="400px">
       <mat-card-header fxLayoutAlign="center">
@@ -24,3 +24,5 @@
     </mat-card>
   </form>
 </section>
+
+<app-current-training *ngIf="exerciseStarted" [exercise]="formGroup.value.exercise"></app-current-training>

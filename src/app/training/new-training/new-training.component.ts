@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import { TrainingService } from '../training.service';
 import { Exercise } from '../exercise.model';
@@ -9,9 +10,13 @@ import { Exercise } from '../exercise.model';
   templateUrl: './new-training.component.html',
   styleUrls: ['./new-training.component.css']
 })
-export class NewTrainingComponent implements OnInit {
+export class NewTrainingComponent implements OnInit, OnDestroy {
   formGroup: FormGroup;
   availableExercises: Exercise[] = [];
+
+  exerciseStarted: boolean = false;
+
+  private exerciseStatusChangedSubscription: Subscription;
 
   constructor(private trainingService: TrainingService) { }
 
@@ -21,10 +26,18 @@ export class NewTrainingComponent implements OnInit {
     });
 
     this.availableExercises = this.trainingService.availableExercises;
+
+    this.exerciseStatusChangedSubscription = this.trainingService.onExerciseStatusChanged
+      .subscribe(() => {
+        this.exerciseStarted = this.trainingService.exerciseStarted;
+      });
+  }
+
+  ngOnDestroy() {
+    this.exerciseStatusChangedSubscription.unsubscribe()
   }
 
   onSubmit() {
-    console.log(this.formGroup.value);
-    this.trainingService.startTraining(this.formGroup.value.exercise);
+    this.trainingService.startExercise(this.formGroup.value.exercise);
   }
 }
