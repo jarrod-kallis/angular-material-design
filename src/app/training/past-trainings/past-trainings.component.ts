@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { MatTableDataSource, MatSort } from '@angular/material';
+import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { Subscription } from 'rxjs';
 
 import { Exercise, ExerciseStatus } from '../exercise.model';
@@ -15,6 +15,7 @@ export class PastTrainingsComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Exercise>();
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   private exerciseStatusChangedSubscription: Subscription;
 
@@ -22,6 +23,7 @@ export class PastTrainingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
     this.dataSource.filterPredicate = this.filterPredicate;
 
     this.exerciseStatusChangedSubscription = this.trainingService.onExerciseStatusChanged

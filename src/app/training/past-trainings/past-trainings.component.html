@@ -1,5 +1,5 @@
 <div fxLayoutAlign="center center">
-  <mat-form-field fxFlex="40" fxFlex.xs="90">
+  <mat-form-field fxFlex="40%" fxFlex.xs="90%">
     <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Filter">
   </mat-form-field>
 </div>
@@ -37,3 +37,5 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+
+<mat-paginator [pageSize]="1" [pageSizeOptions]="[1, 5, 10, 20]"></mat-paginator>
