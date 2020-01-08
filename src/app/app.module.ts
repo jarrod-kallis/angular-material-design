@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AngularFireModule } from 'angularfire2';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,6 +21,7 @@ import { NavigationToolbarComponent } from './navigation/navigation-toolbar/navi
 import { NavigationLinkComponent } from './navigation/navigation-links/navigation-link/navigation-link.component';
 import { StopTrainingDialogComponent } from './training/current-training/stop-training-dialog/stop-training-dialog.component';
 import { StatusPipe } from './training/status.pipe';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -42,7 +45,9 @@ import { StatusPipe } from './training/status.pipe';
     BrowserAnimationsModule,
     FlexLayoutModule,
     ReactiveFormsModule,
-    AngularMaterialModule
+    AngularMaterialModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule
   ],
   providers: [],
   bootstrap: [AppComponent],

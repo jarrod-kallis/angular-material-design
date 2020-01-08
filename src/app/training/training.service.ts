@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject, Observable } from 'rxjs';
+import { AngularFirestore } from 'angularfire2/firestore';
+import { tap } from 'rxjs/operators';
 
 import { Exercise, ExerciseStatus } from './exercise.model';
 
@@ -7,12 +9,12 @@ import { Exercise, ExerciseStatus } from './exercise.model';
   providedIn: 'root'
 })
 export class TrainingService {
-  private _availableExercises: Exercise[] = [
-    new Exercise('pull-ups', 'Pull Ups', 10, 20),
-    new Exercise('monkey-bars', 'Monkey Bars', 30, 50),
-    new Exercise('burpees', 'Burpees', 60, 150),
-    new Exercise('cross-trainer', 'Cross Trainer', 120, 250),
-  ];
+  private _availableExercises: Exercise[] = [];
+  //   new Exercise('pull-ups', 'Pull Ups', 10, 20),
+  //   new Exercise('monkey-bars', 'Monkey Bars', 30, 50),
+  //   new Exercise('burpees', 'Burpees', 60, 150),
+  //   new Exercise('cross-trainer', 'Cross Trainer', 120, 250),
+  // ];
 
   private _attemptedExercises: Exercise[] = [];
 
@@ -24,7 +26,19 @@ export class TrainingService {
   private _onExerciseStatusChanged = new BehaviorSubject<void>(null);
   private _onExerciseProgressPercentageChanged = new Subject<number>();
 
-  constructor() { }
+  constructor(private db: AngularFirestore) { }
+
+  get availableExercisesObservable(): Observable<Exercise[]> {
+    // { idField: 'id' }: Adds the id field to the valueChanges observable, otherwise it only returns the user-created data
+    // https://stackoverflow.com/questions/46900430/firestore-getting-documents-id-from-collection
+    return (this.db.collection<Exercise>('availableExercises')
+      .valueChanges({ idField: 'id' }) as Observable<Exercise[]>)
+      .pipe(
+        tap((exercises: Exercise[]) => {
+          this._availableExercises = exercises;
+        })
+      );
+  }
 
   get availableExercises(): Exercise[] {
     return [...this._availableExercises];

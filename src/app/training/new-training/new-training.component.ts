@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 
 import { TrainingService } from '../training.service';
 import { Exercise } from '../exercise.model';
@@ -12,7 +12,8 @@ import { Exercise } from '../exercise.model';
 })
 export class NewTrainingComponent implements OnInit, OnDestroy {
   formGroup: FormGroup;
-  availableExercises: Exercise[] = [];
+  // availableExercises: Exercise[] = [];
+  availableExercises: Observable<any>;
 
   exerciseStarted: boolean = false;
 
@@ -25,7 +26,8 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
       'exercise': new FormControl('', [Validators.required])
     });
 
-    this.availableExercises = this.trainingService.availableExercises;
+    // this.availableExercises = this.trainingService.availableExercises;
+    this.availableExercises = this.trainingService.availableExercisesObservable;
 
     this.exerciseStatusChangedSubscription = this.trainingService.onExerciseStatusChanged
       .subscribe(() => {
