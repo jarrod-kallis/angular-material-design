@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { MatTableDataSource, MatSort } from '@angular/material';
 import { Subscription } from 'rxjs';
 
-import { Exercise } from '../exercise.model';
+import { Exercise, ExerciseStatus } from '../exercise.model';
 import { TrainingService } from '../training.service';
 
 @Component({
@@ -22,6 +22,7 @@ export class PastTrainingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.dataSource.sort = this.sort;
+    this.dataSource.filterPredicate = this.filterPredicate;
 
     this.exerciseStatusChangedSubscription = this.trainingService.onExerciseStatusChanged
       .subscribe(() => {
@@ -31,5 +32,37 @@ export class PastTrainingsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.exerciseStatusChangedSubscription.unsubscribe();
+  }
+
+  filterPredicate(data: Exercise, filterValue: string): boolean {
+    let foundIdx: number = -1;
+
+    foundIdx = data.name.trim().toLowerCase().indexOf(filterValue);
+    if (foundIdx === -1) {
+      foundIdx = ("" + data.duration).indexOf(filterValue);
+    }
+    if (foundIdx === -1) {
+      foundIdx = ("" + data.calories).indexOf(filterValue);
+    }
+    if (foundIdx === -1) {
+      foundIdx = ExerciseStatus[data.status].trim().toLowerCase().indexOf(filterValue);
+    }
+    if (foundIdx === -1) {
+      foundIdx = ("" + data.startDate).trim().toLowerCase().indexOf(filterValue);
+    }
+    if (foundIdx === -1 && data.endDate) {
+      foundIdx = ("" + data.endDate).trim().toLowerCase().indexOf(filterValue);
+    }
+
+    console.log(data, filterValue, foundIdx);
+    // const exerciseConcat: string = (data.id + data.name + data.duration + data.calories + ExerciseStatus[data.status] + data.startDate + data.endDate).trim().toLowerCase();
+    // console.log(exerciseConcat, exerciseConcat.indexOf(filterValue));
+
+    // return exerciseConcat.indexOf(filterValue) > -1;
+    return foundIdx > -1;
+  }
+
+  doFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 }
