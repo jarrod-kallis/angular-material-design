@@ -11,7 +11,7 @@ import { TrainingService } from '../training.service';
   styleUrls: ['./past-trainings.component.css']
 })
 export class PastTrainingsComponent implements OnInit, OnDestroy {
-  displayedColumns: string[] = ['startDate', 'name', 'duration', 'calories', 'status'];
+  displayedColumns: string[] = ['startDate', 'endDate', 'name', 'duration', 'calories', 'status'];
   dataSource = new MatTableDataSource<Exercise>();
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
@@ -58,7 +58,7 @@ export class PastTrainingsComponent implements OnInit, OnDestroy {
       foundIdx = ("" + data.endDate).trim().toLowerCase().indexOf(filterValue);
     }
 
-    console.log(data, filterValue, foundIdx);
+    // console.log(data, filterValue, foundIdx);
     // const exerciseConcat: string = (data.id + data.name + data.duration + data.calories + ExerciseStatus[data.status] + data.startDate + data.endDate).trim().toLowerCase();
     // console.log(exerciseConcat, exerciseConcat.indexOf(filterValue));
 

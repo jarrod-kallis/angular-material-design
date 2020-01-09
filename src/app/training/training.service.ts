@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import { AngularFirestore, DocumentReference } from 'angularfire2/firestore';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
 
 import { Exercise, ExerciseStatus } from './exercise.model';
 
@@ -114,7 +116,7 @@ export class TrainingService {
   public startExercise(exerciseId: string) {
     this._currentExercise = { ...this.getExerciseById(exerciseId) };
     this._currentExercise.status = ExerciseStatus.Busy;
-    this._currentExercise.startDate = new Date();
+    this._currentExercise.startDate = firebase.firestore.Timestamp.now();
 
     // Current exercise is inserted in the beginning of the array
     this._attemptedExercises.unshift(this._currentExercise);
@@ -127,7 +129,7 @@ export class TrainingService {
     this._onAttemptedExercisesChanged.next();
   }
 
-  private completeOrCancelExercise(status: ExerciseStatus, duration: number, calories: number, endDate: Date): void {
+  private completeOrCancelExercise(status: ExerciseStatus, duration: number, calories: number, endDate: firebase.firestore.Timestamp): void {
     let newExercise: Exercise = new Exercise(
       this._currentExercise.id,
       this._currentExercise.name,
@@ -174,7 +176,7 @@ export class TrainingService {
       ExerciseStatus.Completed,
       this._currentExercise.duration,
       this._currentExercise.calories,
-      new Date()
+      firebase.firestore.Timestamp.now()
     );
   }
 
@@ -183,7 +185,7 @@ export class TrainingService {
       ExerciseStatus.Cancelled,
       this._currentExercise.duration * (this._exerciseProgressPercentage / 100),
       this._currentExercise.calories * (this._exerciseProgressPercentage / 100),
-      new Date()
+      firebase.firestore.Timestamp.now()
     );
   }
 

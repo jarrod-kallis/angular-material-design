@@ -1,3 +1,5 @@
+import { firestore } from 'firebase';
+
 export enum ExerciseStatus {
   NotStarted,
   Busy,
@@ -10,13 +12,13 @@ export class Exercise {
   name: string;
   duration: number; // in seconds
   calories: number;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: firestore.Timestamp;
+  endDate?: firestore.Timestamp;
   status?: ExerciseStatus;
 
   constructor(id: string, name: string, duration: number,
     calories: number, status: ExerciseStatus = ExerciseStatus.NotStarted,
-    startDate?: Date, endDate?: Date) {
+    startDate?: firestore.Timestamp, endDate?: firestore.Timestamp) {
     this.id = id;
     this.name = name;
     this.duration = duration;
