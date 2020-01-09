@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
-import { AngularFirestore } from 'angularfire2/firestore';
+import { AngularFirestore, DocumentReference } from 'angularfire2/firestore';
 import { tap } from 'rxjs/operators';
 
 import { Exercise, ExerciseStatus } from './exercise.model';
@@ -10,11 +10,6 @@ import { Exercise, ExerciseStatus } from './exercise.model';
 })
 export class TrainingService {
   private _availableExercises: Exercise[] = [];
-  //   new Exercise('pull-ups', 'Pull Ups', 10, 20),
-  //   new Exercise('monkey-bars', 'Monkey Bars', 30, 50),
-  //   new Exercise('burpees', 'Burpees', 60, 150),
-  //   new Exercise('cross-trainer', 'Cross Trainer', 120, 250),
-  // ];
 
   private _attemptedExercises: Exercise[] = [];
 
@@ -25,19 +20,33 @@ export class TrainingService {
 
   private _onExerciseStatusChanged = new BehaviorSubject<void>(null);
   private _onExerciseProgressPercentageChanged = new Subject<number>();
+  private _onAvailableExecisesChanged = new Subject<void>();
 
   constructor(private db: AngularFirestore) { }
 
-  get availableExercisesObservable(): Observable<Exercise[]> {
+  public fetchAvailableExercises(): void {
     // { idField: 'id' }: Adds the id field to the valueChanges observable, otherwise it only returns the user-created data
     // https://stackoverflow.com/questions/46900430/firestore-getting-documents-id-from-collection
-    return (this.db.collection<Exercise>('availableExercises')
+    (this.db.collection<Exercise>('availableExercises')
       .valueChanges({ idField: 'id' }) as Observable<Exercise[]>)
-      .pipe(
-        tap((exercises: Exercise[]) => {
-          this._availableExercises = exercises;
-        })
-      );
+      .subscribe((exercises: Exercise[]) => {
+        this._availableExercises = [...exercises];
+        this._onAvailableExecisesChanged.next();
+      });
+
+    // Another way of getting the exercise data, but the way above is better if using Angular 8+ & Firebase 6+
+    // return this.db.collection<Exercise>('availableExercises')
+    //   .snapshotChanges()
+    //   .pipe(
+    //     map(dataArray => {
+    //       console.log(dataArray);
+    //       return dataArray.map(data => ({
+    //         id: data.payload.doc.id,
+    //         ...data.payload.doc.data()
+    //       }))
+    //     })
+    //   )
+    //   .subscribe(exercises => console.log(exercises));
   }
 
   get availableExercises(): Exercise[] {
@@ -72,6 +81,10 @@ export class TrainingService {
     return this._onExerciseProgressPercentageChanged;
   }
 
+  get onAvailableExercisesChanged(): Subject<void> {
+    return this._onAvailableExecisesChanged;
+  }
+
   private getExerciseById(exerciseId: string): Exercise {
     return this._availableExercises.find((exercise: Exercise) => exercise.id === exerciseId);
   }
@@ -90,62 +103,49 @@ export class TrainingService {
     this._onExerciseStatusChanged.next();
   }
 
-  public completeExercise() {
-    this._attemptedExercises = this._attemptedExercises.map(
-      (exercise: Exercise, idx: number) => {
-        if (idx === this._attemptedExercises.length - 1) {
-          return new Exercise(
-            this._currentExercise.id,
-            this._currentExercise.name,
-            this._currentExercise.duration,
-            this._currentExercise.calories,
-            ExerciseStatus.Completed,
-            this._currentExercise.startDate,
-            new Date()
-          );
-        } else {
-          return exercise;
-        }
-      }
+  private completeOrCancelExercise(status: ExerciseStatus, endDate: Date): void {
+    let newExercise: Exercise = new Exercise(
+      this._currentExercise.id,
+      this._currentExercise.name,
+      this._currentExercise.duration,
+      this._currentExercise.calories,
+      status,
+      this._currentExercise.startDate,
+      endDate
     );
+
+    this.db.collection('attemptedExercises')
+      .add(newExercise.objectToSave())
+      .then((result: DocumentReference) => {
+        this._attemptedExercises = this._attemptedExercises.map(
+          (exercise: Exercise, idx: number) => {
+            if (idx === this._attemptedExercises.length - 1) {
+              newExercise.id = result.id;
+              return newExercise;
+              // The above is better, because it results in an actual Exercise object being added,
+              // instead of an object that has the same properties as an Exercise
+              // return { ...completedExercise, id: result.id };
+            } else {
+              return exercise;
+            }
+          }
+        );
+        console.log(this._attemptedExercises);
+        this._onExerciseStatusChanged.next();
+      });
 
     this._exerciseProgressPercentage = 0;
     this._exerciseStarted = false;
     this._currentExercise = null;
     this.stopExerciseTimer();
+  }
 
-    this._onExerciseStatusChanged.next();
-
-    console.log(this._attemptedExercises);
+  public completeExercise() {
+    this.completeOrCancelExercise(ExerciseStatus.Completed, new Date());
   }
 
   public cancelExercise() {
-    this._attemptedExercises = this._attemptedExercises.map(
-      (exercise: Exercise, idx: number) => {
-        if (idx === this._attemptedExercises.length - 1) {
-          return new Exercise(
-            this._currentExercise.id,
-            this._currentExercise.name,
-            this._currentExercise.duration * (this._exerciseProgressPercentage / 100),
-            this._currentExercise.calories * (this._exerciseProgressPercentage / 100),
-            ExerciseStatus.Cancelled,
-            this._currentExercise.startDate,
-            new Date()
-          );
-        } else {
-          return exercise;
-        }
-      }
-    );
-
-    this._exerciseProgressPercentage = 0;
-    this._exerciseStarted = false;
-    this._currentExercise = null;
-    this.stopExerciseTimer();
-
-    this._onExerciseStatusChanged.next();
-
-    console.log(this._attemptedExercises);
+    this.completeOrCancelExercise(ExerciseStatus.Cancelled, new Date());
   }
 
   public pauseExercise() {

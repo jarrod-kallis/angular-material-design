@@ -25,4 +25,12 @@ export class Exercise {
     this.startDate = startDate;
     this.endDate = endDate;
   }
+
+  public objectToSave?(): any {
+    const { id, ...stuffToSaveToDB } = this;
+
+    // console.log(stuffToSaveToDB);
+
+    return stuffToSaveToDB;
+  }
 }

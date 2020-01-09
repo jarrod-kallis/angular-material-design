@@ -12,12 +12,12 @@ import { Exercise } from '../exercise.model';
 })
 export class NewTrainingComponent implements OnInit, OnDestroy {
   formGroup: FormGroup;
-  // availableExercises: Exercise[] = [];
-  availableExercises: Observable<any>;
+  availableExercises: Exercise[] = [];
 
   exerciseStarted: boolean = false;
 
   private exerciseStatusChangedSubscription: Subscription;
+  private availableExercisesChangedSubscription: Subscription;
 
   constructor(private trainingService: TrainingService) { }
 
@@ -26,8 +26,11 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
       'exercise': new FormControl('', [Validators.required])
     });
 
-    // this.availableExercises = this.trainingService.availableExercises;
-    this.availableExercises = this.trainingService.availableExercisesObservable;
+    this.trainingService.fetchAvailableExercises();
+    this.availableExercisesChangedSubscription = this.trainingService.onAvailableExercisesChanged
+      .subscribe(() => {
+        this.availableExercises = this.trainingService.availableExercises;
+      });
 
     this.exerciseStatusChangedSubscription = this.trainingService.onExerciseStatusChanged
       .subscribe(() => {
@@ -37,6 +40,7 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.exerciseStatusChangedSubscription.unsubscribe()
+    this.availableExercisesChangedSubscription.unsubscribe();
   }
 
   onSubmit() {
