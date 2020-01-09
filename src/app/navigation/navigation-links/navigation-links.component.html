@@ -1,18 +1,21 @@
-<app-navigation-link *ngIf="!isAuthenticated" routerLink="signup" [iconName]="displayIcon() && 'create'"
-  caption="Sign Up">
-</app-navigation-link>
-<app-navigation-link *ngIf="!isAuthenticated" routerLink="login" [iconName]="displayIcon() && 'lock'" caption="Log In">
-</app-navigation-link>
-<app-navigation-link *ngIf="isAuthenticated" routerLink="training" [iconName]="displayIcon() && 'fitness_center'"
-  caption="Training">
-</app-navigation-link>
-<app-navigation-link *ngIf="isAuthenticated" [iconName]="displayIcon() && 'exit_to_app'" caption="Logout"
-  (onClick)="onLogout()">
-</app-navigation-link>
+<ng-template [ngIf]="!isLoading">
+  <app-navigation-link *ngIf="!isAuthenticated" routerLink="signup" [iconName]="displayIcon() && 'create'"
+    caption="Sign Up">
+  </app-navigation-link>
+  <app-navigation-link *ngIf="!isAuthenticated" routerLink="login" [iconName]="displayIcon() && 'lock'"
+    caption="Log In">
+  </app-navigation-link>
+  <app-navigation-link *ngIf="isAuthenticated" routerLink="training" [iconName]="displayIcon() && 'fitness_center'"
+    caption="Training">
+  </app-navigation-link>
+  <app-navigation-link *ngIf="isAuthenticated" [iconName]="displayIcon() && 'exit_to_app'" caption="Logout"
+    (onClick)="onLogout()">
+  </app-navigation-link>
 
-<!-- <mat-list-item class="navigation-link">
-  <button mat-icon-button>
-    <mat-icon>exit_to_app</mat-icon>
-    <span class="caption">Logout</span>
-  </button>
-</mat-list-item> -->
+  <!-- <mat-list-item class="navigation-link">
+    <button mat-icon-button>
+      <mat-icon>exit_to_app</mat-icon>
+      <span class="caption">Logout</span>
+    </button>
+  </mat-list-item> -->
+</ng-template>

@@ -13,12 +13,17 @@ export class NavigationLinksComponent implements OnInit, OnDestroy {
 
   private onUserChangedSubscription: Subscription;
   isAuthenticated: boolean = false;
+  // Used to only display the menu items once we know if we are logged in or not
+  isLoading: boolean = true;
 
   constructor(private authService: AuthService) { }
 
   ngOnInit() {
     this.onUserChangedSubscription = this.authService.onUserChangedEvent
-      .subscribe(() => this.isAuthenticated = this.authService.isAuthenticated());
+      .subscribe(() => {
+        this.isAuthenticated = this.authService.isAuthenticated();
+        this.isLoading = false;
+      });
   }
 
   ngOnDestroy() {

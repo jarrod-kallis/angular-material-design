@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject, BehaviorSubject, Observable } from 'rxjs';
+import { Subject, BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { AngularFirestore, DocumentReference } from 'angularfire2/firestore';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -26,12 +26,21 @@ export class TrainingService {
   private _onAvailableExercisesChanged = new Subject<void>();
   private _onAttemptedExercisesChanged = new BehaviorSubject<void>(null);
 
+  private fetchAvailableExercisesSubscription: Subscription;
+  private fetchAttemptedExercisesSubscription: Subscription;
+
   constructor(private db: AngularFirestore) { }
 
   public fetchAvailableExercises(): void {
+    if (this.fetchAvailableExercisesSubscription) {
+      // console.log('TrainingService.fetchAvailableExercises() unsubscribe');
+      this.fetchAvailableExercisesSubscription.unsubscribe();
+      this.fetchAvailableExercisesSubscription = null;
+    }
+
     // { idField: 'id' }: Adds the id field to the valueChanges observable, otherwise it only returns the user-created data
     // https://stackoverflow.com/questions/46900430/firestore-getting-documents-id-from-collection
-    (this.db.collection<Exercise>('availableExercises')
+    this.fetchAvailableExercisesSubscription = (this.db.collection<Exercise>('availableExercises')
       .valueChanges({ idField: 'id' }) as Observable<Exercise[]>)
       .subscribe((exercises: Exercise[]) => {
         this._availableExercises = [...exercises];
@@ -54,7 +63,13 @@ export class TrainingService {
   }
 
   public fetchAttemptedExercises(): void {
-    this.db.collection<Exercise>('attemptedExercises')
+    if (this.fetchAttemptedExercisesSubscription) {
+      // console.log('TrainingService.fetchAttemptedExercises() unsubscribe');
+      this.fetchAttemptedExercisesSubscription.unsubscribe();
+      this.fetchAttemptedExercisesSubscription = null;
+    }
+
+    this.fetchAttemptedExercisesSubscription = this.db.collection<Exercise>('attemptedExercises')
       .valueChanges({ idField: 'id' })
       .subscribe((exercises: Exercise[]) => {
         // When anything is written to 'attemptedExercises' then this subscription is called automatically.
@@ -232,5 +247,21 @@ export class TrainingService {
 
   private stopExerciseTimer() {
     clearInterval(this._exerciseProgressTimerId);
+  }
+
+  public unsubscribe() {
+    // console.log('TrainingService.unsubscribe()');
+
+    if (this.fetchAvailableExercisesSubscription) {
+      this.fetchAvailableExercisesSubscription.unsubscribe();
+      this.fetchAvailableExercisesSubscription = null;
+      // console.log('fetchAvailableExercisesSubscription unsubscribed');
+    }
+
+    if (this.fetchAttemptedExercisesSubscription) {
+      this.fetchAttemptedExercisesSubscription.unsubscribe();
+      this.fetchAttemptedExercisesSubscription = null;
+      // console.log('fetchAttemptedExercisesSubscription unsubscribed');
+    }
   }
 }
