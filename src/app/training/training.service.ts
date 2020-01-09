@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { finalize, take } from 'rxjs/operators';
 import { AngularFirestore, DocumentReference } from 'angularfire2/firestore';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 
 import { Exercise, ExerciseStatus } from './exercise.model';
+import { GuiService } from '../shared/services/gui.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,9 +31,11 @@ export class TrainingService {
   private fetchAvailableExercisesSubscription: Subscription;
   private fetchAttemptedExercisesSubscription: Subscription;
 
-  constructor(private db: AngularFirestore) { }
+  constructor(private db: AngularFirestore, private guiService: GuiService) { }
 
   public fetchAvailableExercises(): void {
+    this.guiService.isLoading = true;
+
     if (this.fetchAvailableExercisesSubscription) {
       // console.log('TrainingService.fetchAvailableExercises() unsubscribe');
       this.fetchAvailableExercisesSubscription.unsubscribe();
@@ -42,6 +46,12 @@ export class TrainingService {
     // https://stackoverflow.com/questions/46900430/firestore-getting-documents-id-from-collection
     this.fetchAvailableExercisesSubscription = (this.db.collection<Exercise>('availableExercises')
       .valueChanges({ idField: 'id' }) as Observable<Exercise[]>)
+      .pipe(
+        take(1),
+        finalize(() => {
+          this.guiService.isLoading = false
+        })
+      )
       .subscribe((exercises: Exercise[]) => {
         this._availableExercises = [...exercises];
         this._onAvailableExercisesChanged.next();

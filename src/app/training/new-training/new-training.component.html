@@ -8,15 +8,16 @@
         <mat-card-subtitle>Select your workout</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content fxLayoutAlign="center">
-        <mat-form-field>
+        <mat-form-field *ngIf="!isLoading">
           <mat-select placeholder="Exercise" formControlName="exercise" required>
             <mat-option *ngFor="let exercise of availableExercises" [value]="exercise.id">
               {{ exercise.name }}
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-spinner *ngIf="isLoading"></mat-spinner>
       </mat-card-content>
-      <mat-card-actions fxLayoutAlign="center">
+      <mat-card-actions fxLayoutAlign="center" *ngIf="!isLoading">
         <button type="submit" mat-button color="primary" [disabled]="!formGroup.valid">
           Start
         </button>
