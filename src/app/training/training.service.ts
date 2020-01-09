@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import { AngularFirestore, DocumentReference } from 'angularfire2/firestore';
-import { tap } from 'rxjs/operators';
 
 import { Exercise, ExerciseStatus } from './exercise.model';
 
@@ -9,8 +8,10 @@ import { Exercise, ExerciseStatus } from './exercise.model';
   providedIn: 'root'
 })
 export class TrainingService {
+  // All possible exercises to choose from
   private _availableExercises: Exercise[] = [];
 
+  // All exercises that the user has started
   private _attemptedExercises: Exercise[] = [];
 
   private _currentExercise: Exercise;
@@ -20,7 +21,8 @@ export class TrainingService {
 
   private _onExerciseStatusChanged = new BehaviorSubject<void>(null);
   private _onExerciseProgressPercentageChanged = new Subject<number>();
-  private _onAvailableExecisesChanged = new Subject<void>();
+  private _onAvailableExercisesChanged = new Subject<void>();
+  private _onAttemptedExercisesChanged = new BehaviorSubject<void>(null);
 
   constructor(private db: AngularFirestore) { }
 
@@ -31,7 +33,7 @@ export class TrainingService {
       .valueChanges({ idField: 'id' }) as Observable<Exercise[]>)
       .subscribe((exercises: Exercise[]) => {
         this._availableExercises = [...exercises];
-        this._onAvailableExecisesChanged.next();
+        this._onAvailableExercisesChanged.next();
       });
 
     // Another way of getting the exercise data, but the way above is better if using Angular 8+ & Firebase 6+
@@ -47,6 +49,22 @@ export class TrainingService {
     //     })
     //   )
     //   .subscribe(exercises => console.log(exercises));
+  }
+
+  public fetchAttemptedExercises(): void {
+    this.db.collection<Exercise>('attemptedExercises')
+      .valueChanges({ idField: 'id' })
+      .subscribe((exercises: Exercise[]) => {
+        // When anything is written to 'attemptedExercises' then this subscription is called automatically.
+        // The current exercise will be first in the list if we are currently doing an exercise.
+        if (this._exerciseStarted) {
+          this._attemptedExercises = [{ ...this._attemptedExercises[0] }, ...exercises];
+        } else {
+          this._attemptedExercises = [...exercises];
+        }
+
+        this._onAttemptedExercisesChanged.next();
+      });
   }
 
   get availableExercises(): Exercise[] {
@@ -82,7 +100,11 @@ export class TrainingService {
   }
 
   get onAvailableExercisesChanged(): Subject<void> {
-    return this._onAvailableExecisesChanged;
+    return this._onAvailableExercisesChanged;
+  }
+
+  get onAttemptedExercisesChanged(): Subject<void> {
+    return this._onAttemptedExercisesChanged;
   }
 
   private getExerciseById(exerciseId: string): Exercise {
@@ -94,58 +116,75 @@ export class TrainingService {
     this._currentExercise.status = ExerciseStatus.Busy;
     this._currentExercise.startDate = new Date();
 
-    this._attemptedExercises.push(this._currentExercise);
+    // Current exercise is inserted in the beginning of the array
+    this._attemptedExercises.unshift(this._currentExercise);
 
     this._exerciseProgressPercentage = 0;
     this._exerciseStarted = true;
     this.startExerciseTimer();
 
     this._onExerciseStatusChanged.next();
+    this._onAttemptedExercisesChanged.next();
   }
 
-  private completeOrCancelExercise(status: ExerciseStatus, endDate: Date): void {
+  private completeOrCancelExercise(status: ExerciseStatus, duration: number, calories: number, endDate: Date): void {
     let newExercise: Exercise = new Exercise(
       this._currentExercise.id,
       this._currentExercise.name,
-      this._currentExercise.duration,
-      this._currentExercise.calories,
+      duration,
+      calories,
       status,
       this._currentExercise.startDate,
       endDate
     );
 
-    this.db.collection('attemptedExercises')
-      .add(newExercise.objectToSave())
-      .then((result: DocumentReference) => {
-        this._attemptedExercises = this._attemptedExercises.map(
-          (exercise: Exercise, idx: number) => {
-            if (idx === this._attemptedExercises.length - 1) {
-              newExercise.id = result.id;
-              return newExercise;
-              // The above is better, because it results in an actual Exercise object being added,
-              // instead of an object that has the same properties as an Exercise
-              // return { ...completedExercise, id: result.id };
-            } else {
-              return exercise;
-            }
-          }
-        );
-        console.log(this._attemptedExercises);
-        this._onExerciseStatusChanged.next();
-      });
-
     this._exerciseProgressPercentage = 0;
     this._exerciseStarted = false;
     this._currentExercise = null;
     this.stopExerciseTimer();
+
+    this.db.collection('attemptedExercises')
+      .add(newExercise.objectToSave())
+      .then((result: DocumentReference) => {
+        // No need to work out the attemptedExercises array manually here, because the subscription to the 'attemptedExercises' collection,
+        // in fetchAttemptedExercises, will be called and have the details of the newly added exercise.
+
+        // this._attemptedExercises = this._attemptedExercises.map(
+        //   (exercise: Exercise, idx: number) => {
+        //     if (idx === 0) {
+        //       newExercise.id = result.id;
+        //       return newExercise;
+        //       // The above is better, because it results in an actual Exercise object being added,
+        //       // instead of an object that has the same properties as an Exercise
+        //       // return { ...completedExercise, id: result.id };
+        //     } else {
+        //       return exercise;
+        //     }
+        //   }
+        // );
+        // console.log(this._attemptedExercises);
+
+        this._onExerciseStatusChanged.next();
+        this._onAttemptedExercisesChanged.next();
+      });
   }
 
   public completeExercise() {
-    this.completeOrCancelExercise(ExerciseStatus.Completed, new Date());
+    this.completeOrCancelExercise(
+      ExerciseStatus.Completed,
+      this._currentExercise.duration,
+      this._currentExercise.calories,
+      new Date()
+    );
   }
 
   public cancelExercise() {
-    this.completeOrCancelExercise(ExerciseStatus.Cancelled, new Date());
+    this.completeOrCancelExercise(
+      ExerciseStatus.Cancelled,
+      this._currentExercise.duration * (this._exerciseProgressPercentage / 100),
+      this._currentExercise.calories * (this._exerciseProgressPercentage / 100),
+      new Date()
+    );
   }
 
   public pauseExercise() {
@@ -162,7 +201,7 @@ export class TrainingService {
 
       this._attemptedExercises = this._attemptedExercises.map(
         (exercise: Exercise, idx: number) => {
-          if (idx === this._attemptedExercises.length - 1) {
+          if (idx === 0) {
             return new Exercise(
               this._currentExercise.id,
               this._currentExercise.name,
@@ -181,9 +220,10 @@ export class TrainingService {
       if (this._exerciseProgressPercentage >= 100) {
         this._exerciseProgressPercentage = 100;
         this.completeExercise();
+      } else {
+        this._onAttemptedExercisesChanged.next();
       }
 
-      this._onExerciseStatusChanged.next();
       this._onExerciseProgressPercentageChanged.next(this._exerciseProgressPercentage);
     }, 1000);
   }

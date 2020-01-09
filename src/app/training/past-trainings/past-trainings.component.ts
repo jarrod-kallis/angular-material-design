@@ -17,7 +17,7 @@ export class PastTrainingsComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
-  private exerciseStatusChangedSubscription: Subscription;
+  private attemptedExercisesChangedSubscription: Subscription;
 
   constructor(private trainingService: TrainingService) { }
 
@@ -26,14 +26,16 @@ export class PastTrainingsComponent implements OnInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.dataSource.filterPredicate = this.filterPredicate;
 
-    this.exerciseStatusChangedSubscription = this.trainingService.onExerciseStatusChanged
+    this.attemptedExercisesChangedSubscription = this.trainingService.onAttemptedExercisesChanged
       .subscribe(() => {
         this.dataSource.data = this.trainingService.attemptedExercises;
-      })
+      });
+
+    this.trainingService.fetchAttemptedExercises();
   }
 
   ngOnDestroy() {
-    this.exerciseStatusChangedSubscription.unsubscribe();
+    this.attemptedExercisesChangedSubscription.unsubscribe();
   }
 
   filterPredicate(data: Exercise, filterValue: string): boolean {
