@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { MatSnackBar } from '@angular/material';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +8,7 @@ import { Subject } from 'rxjs';
 export class GuiService {
   private _onLoadingChangedEvent = new Subject<boolean>();
 
-  constructor() { }
+  constructor(private snackBar: MatSnackBar) { }
 
   public get onLoadingChangedEvent(): Subject<boolean> {
     return this._onLoadingChangedEvent;
@@ -15,5 +16,9 @@ export class GuiService {
 
   set isLoading(value: boolean) {
     this._onLoadingChangedEvent.next(value);
+  }
+
+  public showSnackBar(message: string, action: string = null, duration: number = 3000) {
+    this.snackBar.open(message, action, { duration });
   }
 }

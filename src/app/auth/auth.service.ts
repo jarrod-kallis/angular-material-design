@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { MatSnackBar } from '@angular/material';
 
 import { TrainingService } from '../training/training.service';
 import { GuiService } from '../shared/services/gui.service';
@@ -18,8 +17,7 @@ export class AuthService {
     private router: Router,
     private firebaseAuthService: AngularFireAuth,
     private trainingService: TrainingService,
-    private guiService: GuiService,
-    private snackBar: MatSnackBar
+    private guiService: GuiService
   ) { }
 
   public get onUserChangedEvent(): Subject<void> {
@@ -46,21 +44,21 @@ export class AuthService {
   signUp(email: string, password: string, birthday: Date): void {
     this.guiService.isLoading = true;
 
-    this.firebaseAuthService.auth
-      .createUserWithEmailAndPassword(email, password)
-      .catch(error => {
-        this.snackBar.open(error.message, 'Okay');
-      })
-      .finally(() => this.guiService.isLoading = false);
+    this.handleSignUpOrLogin(this.firebaseAuthService.auth
+      .createUserWithEmailAndPassword(email, password));
   }
 
   login(email: string, password: string): void {
     this.guiService.isLoading = true;
 
-    this.firebaseAuthService.auth
-      .signInWithEmailAndPassword(email, password)
+    this.handleSignUpOrLogin(this.firebaseAuthService.auth
+      .signInWithEmailAndPassword(email, password));
+  }
+
+  handleSignUpOrLogin(authAction: Promise<firebase.auth.UserCredential>): void {
+    authAction
       .catch(error => {
-        this.snackBar.open(error.message, 'Okay');
+        this.guiService.showSnackBar(error.message, 'Okay');
       })
       .finally(() => this.guiService.isLoading = false);
   }
