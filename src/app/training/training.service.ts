@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { finalize, take } from 'rxjs/operators';
+import { finalize, take, tap } from 'rxjs/operators';
 import { AngularFirestore, DocumentReference } from 'angularfire2/firestore';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -48,14 +48,17 @@ export class TrainingService {
       .valueChanges({ idField: 'id' }) as Observable<Exercise[]>)
       .pipe(
         take(1),
+        // tap(() => { throw (new Error()); }),
         finalize(() => {
-          this.guiService.isLoading = false
+          this.guiService.isLoading = false;
         })
       )
       .subscribe((exercises: Exercise[]) => {
         this._availableExercises = [...exercises];
         this._onAvailableExercisesChanged.next();
-      });
+      },
+        () => this.guiService.showSnackBar('Unable to load exercises', 'Okay')
+      );
 
     // Another way of getting the exercise data, but the way above is better if using Angular 8+ & Firebase 6+
     // return this.db.collection<Exercise>('availableExercises')
