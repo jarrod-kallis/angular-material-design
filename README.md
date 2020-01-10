@@ -22,3 +22,8 @@ Generate a component for a specific module: `ng g c auth/signup --module app.mod
 [Angularfire Official Docs](https://github.com/angular/angularfire2/blob/master/docs/firestore/collections.md)<br/>
 [Firebase Docs](https://firebase.google.com/docs/web/setup)<br/>
 [More on RxJS Observables](https://academind.com/learn/javascript/understanding-rxjs/)<br/>
+
+## Modules & Lazy Loading
+
+[More on Modules](https://angular.io/guide/ngmodules)<br/>
+[More on Lazy Loading](https://angular.io/guide/lazy-loading-ngmodules)<br/>
