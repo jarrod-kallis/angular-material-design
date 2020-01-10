@@ -74,7 +74,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     return this.getCurrentEmailLength() > 0 && !this.emailControl().valid && this.emailControl().touched;
   }
 
-  private getCurrentPasswordLength(): number {
+  getCurrentPasswordLength(): number {
     return this.formGroup.value.password.length <= 6 ? this.formGroup.value.password.length : 6;
   }
 
