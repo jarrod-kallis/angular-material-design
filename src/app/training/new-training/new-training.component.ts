@@ -1,54 +1,38 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Subscription, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
 
 import { TrainingService } from '../training.service';
 import { Exercise } from '../exercise.model';
-import { GuiService } from '../../shared/services/gui.service';
+import * as fromRoot from '../../app.reducer';
+import * as fromTraining from '../store/training.reducer';
 
 @Component({
   selector: 'app-new-training',
   templateUrl: './new-training.component.html',
   styleUrls: ['./new-training.component.css']
 })
-export class NewTrainingComponent implements OnInit, OnDestroy {
+export class NewTrainingComponent implements OnInit {
   formGroup: FormGroup;
-  availableExercises: Exercise[] = [];
+  availableExercises$: Observable<Exercise[]>;
 
-  exerciseStarted: boolean = false;
-  isLoading: boolean = false;
+  exerciseStarted$: Observable<boolean>;
+  isLoading$: Observable<boolean>;
 
-  private loadingChangedSubscription: Subscription;
-  private exerciseStatusChangedSubscription: Subscription;
-  private availableExercisesChangedSubscription: Subscription;
-
-  constructor(private trainingService: TrainingService, private guiService: GuiService) { }
+  constructor(private trainingService: TrainingService, private store: Store<fromTraining.State>) { }
 
   ngOnInit() {
     this.formGroup = new FormGroup({
       'exercise': new FormControl('', [Validators.required])
     });
 
-    this.loadingChangedSubscription = this.guiService.onLoadingChangedEvent
-      .subscribe((isLoading: boolean) => this.isLoading = isLoading);
-
-    this.availableExercisesChangedSubscription = this.trainingService.onAvailableExercisesChanged
-      .subscribe(() => {
-        this.availableExercises = this.trainingService.availableExercises;
-      });
-
-    this.exerciseStatusChangedSubscription = this.trainingService.onExerciseStatusChanged
-      .subscribe(() => {
-        this.exerciseStarted = this.trainingService.exerciseStarted;
-      });
+    this.isLoading$ = this.store.select(fromRoot.getIsLoading);
 
     this.fetchAvailableExercises();
-  }
 
-  ngOnDestroy() {
-    this.loadingChangedSubscription.unsubscribe();
-    this.exerciseStatusChangedSubscription.unsubscribe()
-    this.availableExercisesChangedSubscription.unsubscribe();
+    this.availableExercises$ = this.store.select(fromTraining.getAvailableExercises);
+    this.exerciseStarted$ = this.store.select(fromTraining.getExerciseStarted);
   }
 
   onSubmit() {

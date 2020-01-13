@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,6 +15,8 @@ import { NavigationLinkComponent } from './navigation/navigation-links/navigatio
 import { environment } from '../environments/environment';
 import { SharedModule } from './shared.module';
 import { AuthModule } from './auth/auth.module';
+import { reducers } from './app.reducer';
+import { TrainingEffects } from './training/store/training.effects';
 
 @NgModule({
   declarations: [
@@ -29,7 +33,9 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    StoreModule.forRoot(reducers),
+    EffectsModule.forRoot([TrainingEffects]),
   ],
   providers: [],
   bootstrap: [AppComponent]

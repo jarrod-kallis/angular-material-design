@@ -1,4 +1,4 @@
-<section fxLayout fxLayoutAlign="center" *ngIf="!exerciseStarted">
+<section fxLayout fxLayoutAlign="center" *ngIf="!(exerciseStarted$ | async)">
   <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <mat-card fxFlex.xs="grow" fxFlex.gt-xs="400px">
       <mat-card-header fxLayoutAlign="center">
@@ -8,22 +8,22 @@
         <mat-card-subtitle>Select your workout</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content fxLayoutAlign="center">
-        <mat-form-field *ngIf="!isLoading && availableExercises.length > 0">
+        <mat-form-field *ngIf="!(isLoading$ | async) && (availableExercises$ | async).length > 0">
           <mat-select placeholder="Exercise" formControlName="exercise" required>
-            <mat-option *ngFor="let exercise of availableExercises" [value]="exercise.id">
+            <mat-option *ngFor="let exercise of (availableExercises$ | async)" [value]="exercise.id">
               {{ exercise.name }}
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-spinner *ngIf="isLoading"></mat-spinner>
+        <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
       </mat-card-content>
-      <mat-card-actions fxLayoutAlign="center" *ngIf="!isLoading">
+      <mat-card-actions fxLayoutAlign="center" *ngIf="!(isLoading$ | async)">
         <button type="submit" mat-button color="primary" [disabled]="!formGroup.valid"
-          *ngIf="availableExercises.length > 0">
+          *ngIf="(availableExercises$ | async).length > 0">
           Start
         </button>
         <button type="button" mat-button color="accent" (click)="fetchAvailableExercises()"
-          *ngIf="availableExercises.length === 0">
+          *ngIf="(availableExercises$ | async).length === 0">
           Reload Exercises
         </button>
       </mat-card-actions>
@@ -31,4 +31,4 @@
   </form>
 </section>
 
-<app-current-training *ngIf="exerciseStarted" [exercise]="formGroup.value.exercise"></app-current-training>
+<app-current-training *ngIf="exerciseStarted$ | async" [exercise]="formGroup.value.exercise"></app-current-training>

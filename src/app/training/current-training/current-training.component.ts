@@ -1,10 +1,12 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
 
 import { TrainingService } from '../training.service';
 import { StopTrainingDialogComponent } from './stop-training-dialog/stop-training-dialog.component';
 import { Exercise } from '../exercise.model';
-import { Subscription } from 'rxjs';
+import * as fromTraining from '../store/training.reducer';
 
 @Component({
   selector: 'app-current-training',
@@ -14,16 +16,18 @@ import { Subscription } from 'rxjs';
 export class CurrentTrainingComponent implements OnInit, OnDestroy {
   @Input() exercise: Exercise;
 
-  exerciseProgressPercentage: number = this.trainingService.exerciseProgressPercentage;
+  exerciseProgressPercentage: number = 0;
   private exerciseProgressPercentageChangedSubscription: Subscription;
 
-  constructor(private trainingService: TrainingService, private dialog: MatDialog) { }
+  constructor(
+    private trainingService: TrainingService,
+    private dialog: MatDialog,
+    private store: Store<fromTraining.State>
+  ) { }
 
   ngOnInit() {
-    this.exerciseProgressPercentageChangedSubscription = this.trainingService.onExerciseProgressPercentageChanged
-      .subscribe((exerciseProgressPercentage: number) => {
-        this.exerciseProgressPercentage = exerciseProgressPercentage;
-      });
+    this.exerciseProgressPercentageChangedSubscription = this.store.select(fromTraining.getExerciseProgressPercentage)
+      .subscribe((percentage: number) => this.exerciseProgressPercentage = percentage);
   }
 
   ngOnDestroy() {
@@ -34,7 +38,7 @@ export class CurrentTrainingComponent implements OnInit, OnDestroy {
     this.trainingService.pauseExercise();
 
     const dialogRef = this.dialog.open(StopTrainingDialogComponent,
-      { data: { progress: this.trainingService.exerciseProgressPercentage } });
+      { data: { progress: this.exerciseProgressPercentage } });
 
     dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result) {

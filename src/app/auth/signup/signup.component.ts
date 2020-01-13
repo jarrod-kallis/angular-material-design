@@ -1,27 +1,25 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
 
 import { AuthService } from '../auth.service';
-import { GuiService } from '../../shared/services/gui.service';
+import * as fromRoot from '../../app.reducer';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
-export class SignupComponent implements OnInit, OnDestroy {
+export class SignupComponent implements OnInit {
   formGroup: FormGroup;
   maxBirthdayDate: Date;
-  isLoading: Boolean;
+  isLoading$: Observable<boolean>;
 
-  private loadingChangedSubscription: Subscription;
-
-  constructor(private authService: AuthService, private guiService: GuiService) { }
+  constructor(private authService: AuthService, private store: Store<fromRoot.State>) { }
 
   ngOnInit() {
-    this.loadingChangedSubscription = this.guiService.onLoadingChangedEvent
-      .subscribe((isLoading: boolean) => this.isLoading = isLoading);
+    this.isLoading$ = this.store.select(fromRoot.getIsLoading);
 
     this.formGroup = new FormGroup({
       'email': new FormControl('', [Validators.required, Validators.email]),
@@ -32,10 +30,6 @@ export class SignupComponent implements OnInit, OnDestroy {
 
     this.maxBirthdayDate = new Date();
     return this.maxBirthdayDate.setFullYear(this.maxBirthdayDate.getFullYear() - 18);
-  }
-
-  ngOnDestroy() {
-    this.loadingChangedSubscription.unsubscribe();
   }
 
   onSubmit() {

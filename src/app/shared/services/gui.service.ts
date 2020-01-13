@@ -1,21 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
+import { Store } from '@ngrx/store';
+
+import * as fromRoot from '../../app.reducer';
+import { StartLoading, StopLoading } from '../store/gui.actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GuiService {
-  private _onLoadingChangedEvent = new Subject<boolean>();
-
-  constructor(private snackBar: MatSnackBar) { }
-
-  public get onLoadingChangedEvent(): Subject<boolean> {
-    return this._onLoadingChangedEvent;
-  }
+  constructor(private snackBar: MatSnackBar, private store: Store<fromRoot.State>) { }
 
   set isLoading(value: boolean) {
-    this._onLoadingChangedEvent.next(value);
+    this.store.dispatch(value ? new StartLoading() : new StopLoading());
   }
 
   public showSnackBar(message: string, action: string = null, duration: number = 3000) {

@@ -9,7 +9,7 @@
       required>
     <mat-error *ngIf="displayPasswordEmptyError()">Please enter a password</mat-error>
   </mat-form-field>
-  <button *ngIf="!isLoading" mat-raised-button color="primary" type="submit"
+  <button *ngIf="!(isLoading$ | async)" mat-raised-button color="primary" type="submit"
     [disabled]="!formGroup.valid">Login</button>
-  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
 </form>

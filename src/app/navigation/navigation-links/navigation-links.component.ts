@@ -1,33 +1,28 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, Input } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
 
 import { AuthService } from '../../auth/auth.service';
+import * as fromRoot from '../../app.reducer';
 
 @Component({
   selector: 'app-navigation-links',
   templateUrl: './navigation-links.component.html',
   styleUrls: ['./navigation-links.component.css']
 })
-export class NavigationLinksComponent implements OnInit, OnDestroy {
+export class NavigationLinksComponent implements OnInit {
   @Input() displayIcons: boolean = false;
 
-  private onUserChangedSubscription: Subscription;
-  isAuthenticated: boolean = false;
+  // private onUserChangedSubscription: Subscription;
+  isAuthenticated$: Observable<boolean>;
   // Used to only display the menu items once we know if we are logged in or not
-  isLoading: boolean = true;
+  isLoading$: Observable<boolean>;
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private store: Store<fromRoot.State>) { }
 
   ngOnInit() {
-    this.onUserChangedSubscription = this.authService.onUserChangedEvent
-      .subscribe(() => {
-        this.isAuthenticated = this.authService.isAuthenticated();
-        this.isLoading = false;
-      });
-  }
-
-  ngOnDestroy() {
-    this.onUserChangedSubscription.unsubscribe();
+    this.isLoading$ = this.store.select(fromRoot.getIsAuthenticating);
+    this.isAuthenticated$ = this.store.select(fromRoot.getIsAuthenticated);
   }
 
   displayIcon(): boolean {

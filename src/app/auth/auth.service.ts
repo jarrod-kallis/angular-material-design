@@ -1,43 +1,36 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
 import { AngularFireAuth } from 'angularfire2/auth';
+import { Store } from '@ngrx/store';
 
-import { TrainingService } from '../training/training.service';
 import { GuiService } from '../shared/services/gui.service';
+import * as fromAuth from './store/auth.reducer';
+import { LoggedIn, LoggedOut, Authenticating } from './store/auth.actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private _isAuthenticated: boolean = false;
-  private _onUserChangedEvent = new Subject<void>();
-
   constructor(
     private router: Router,
     private firebaseAuthService: AngularFireAuth,
-    private trainingService: TrainingService,
-    private guiService: GuiService
+    private guiService: GuiService,
+    private store: Store<fromAuth.State>
   ) { }
 
-  public get onUserChangedEvent(): Subject<void> {
-    return this._onUserChangedEvent;
-  }
-
   public initFirebaseAuthListener() {
+    this.store.dispatch(new Authenticating());
+
     this.firebaseAuthService.authState
       .subscribe(userData => {
-        console.log(userData);
+        // console.log(userData);
         if (userData) {
-          this._isAuthenticated = true;
+          this.isAuthenticated = true;
           this.router.navigate(['training/new']);
         } else {
-          this._isAuthenticated = false;
-          this.trainingService.unsubscribe();
+          this.isAuthenticated = false;
           this.router.navigate(['login']);
         }
-
-        this._onUserChangedEvent.next();
       });
   }
 
@@ -64,10 +57,15 @@ export class AuthService {
   }
 
   logout(): void {
-    this.firebaseAuthService.auth.signOut();
+    this.firebaseAuthService.auth.signOut()
+      .then(() => {
+        // Eliminate the 'FirebaseError: Missing or insufficient permissions'
+        // https://medium.com/@dalenguyen/handle-missing-or-insufficient-permissions-firestore-error-on-angular-or-ionic-bf4edb7a7c68
+        window.location.reload();
+      });
   }
 
-  isAuthenticated(): boolean {
-    return this._isAuthenticated;
+  private set isAuthenticated(value: boolean) {
+    this.store.dispatch(value ? new LoggedIn() : new LoggedOut());
   }
 }

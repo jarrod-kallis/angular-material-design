@@ -27,3 +27,8 @@ Generate a component for a specific module: `ng g c auth/signup --module app.mod
 
 [More on Modules](https://angular.io/guide/ngmodules)<br/>
 [More on Lazy Loading](https://angular.io/guide/lazy-loading-ngmodules)<br/>
+
+## NgRx & RxJS
+
+[NgRx Official Repo & Docs](https://github.com/ngrx/platform)<br/>
+[RxJS in Detail](https://academind.com/learn/javascript/understanding-rxjs/)<br/>
