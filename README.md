@@ -1,6 +1,7 @@
 # FitnessTracker
 
-Generate a component for a specific module: `ng g c auth/signup --module app.module`
+Generate a component for a specific module: `ng g c auth/signup --module app.module`<br/>
+Firebase URL: https://fitness-tracker-2eb50.firebaseapp.com/<br/>
 
 ## Angular Material
 
@@ -32,3 +33,8 @@ Generate a component for a specific module: `ng g c auth/signup --module app.mod
 
 [NgRx Official Repo & Docs](https://github.com/ngrx/platform)<br/>
 [RxJS in Detail](https://academind.com/learn/javascript/understanding-rxjs/)<br/>
+
+## App Theming
+
+[Official Theming Guide](https://material.angular.io/guide/theming)<br/>
+[Colour Guide](https://material.io/archive/guidelines/style/color.html#color-color-palette)<br/>
