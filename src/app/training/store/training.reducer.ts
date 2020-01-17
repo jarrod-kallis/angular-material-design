@@ -32,7 +32,7 @@ const initialState: TrainingState = {
   exerciseProgressPercentage: 0
 }
 
-export default (state: TrainingState = initialState, action: TrainingActions) => {
+export function trainingReducer(state: TrainingState = initialState, action: TrainingActions) {
   switch (action.type) {
     case SET_AVAILABLE_EXERCISES: {
       return {

@@ -1,7 +1,7 @@
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 
-import guiReducer, * as fromGui from './shared/store/gui.reducer';
-import authReducer, * as fromAuth from './auth/store/auth.reducer';
+import * as fromGui from './shared/store/gui.reducer';
+import * as fromAuth from './auth/store/auth.reducer';
 // Can't have training stuff here, because it's lazy loaded
 // import trainingReducer, * as fromTraining from './training/store/training.reducer';
 
@@ -12,8 +12,8 @@ export interface State {
 }
 
 export const reducers: ActionReducerMap<State> = {
-  gui: guiReducer,
-  auth: authReducer,
+  gui: fromGui.guiReducer,
+  auth: fromAuth.authReducer
   // training: trainingReducer
 };
 

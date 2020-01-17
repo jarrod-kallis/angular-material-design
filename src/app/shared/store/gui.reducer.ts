@@ -8,7 +8,7 @@ const initialState: State = {
   isLoading: false
 };
 
-export default (state: State = initialState, action: GuiActions) => {
+export function guiReducer(state: State = initialState, action: GuiActions) {
   switch (action.type) {
     case START_LOADING:
       return {
